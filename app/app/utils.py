@@ -67,3 +67,12 @@ def create_tag(user, name):
 
 def all_tags():
     return models.Tag.objects.all().order_by("-name")
+
+
+def create_recipe(user, title, time, price):
+    return models.Recipe.objects.create(
+        user=user,
+        title=title,
+        time_minutes=time,
+        price=price,
+    )

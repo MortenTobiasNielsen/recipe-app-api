@@ -44,3 +44,13 @@ class ModelTests(TestCase):
         ingredient = utils.create_ingredent(self.user, "Cabbage")
 
         self.assertEqual(str(ingredient), ingredient.name)
+
+    def test_recipe_str(self):
+        """Test the recipe string represention"""
+        recipe = utils.create_recipe(
+            self.user,
+            "Steak and mushroom sauce",
+            5,
+            5.00,
+        )
+        self.assertEqual(str(recipe), recipe.title)
