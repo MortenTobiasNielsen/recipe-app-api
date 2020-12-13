@@ -47,10 +47,5 @@ class ModelTests(TestCase):
 
     def test_recipe_str(self):
         """Test the recipe string represention"""
-        recipe = utils.create_recipe(
-            self.user,
-            "Steak and mushroom sauce",
-            5,
-            5.00,
-        )
+        recipe = utils.create_recipe(self.user)
         self.assertEqual(str(recipe), recipe.title)

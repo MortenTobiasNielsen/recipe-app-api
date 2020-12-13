@@ -3,12 +3,14 @@ from django.urls import reverse
 
 from core import models
 
+ADMIN_CHANGE_URL = reverse("admin:core_user_changelist")
 INGREDIENTS_URL = reverse("recipe:ingredient-list")
 CREATE_USER_URL = reverse("user:create")
 TOKEN_URL = reverse("user:token")
 ME_URL = reverse("user:me")
 TAGS_URL = reverse("recipe:tag-list")
-ADMIN_CHANGE_URL = reverse("admin:core_user_changelist")
+RECIPES_URL = reverse("recipe:recipe-list")
+
 
 ADMIN_PAYLOAD = {
     "email": "admin@test.com",
@@ -69,10 +71,16 @@ def all_tags():
     return models.Tag.objects.all().order_by("-name")
 
 
-def create_recipe(user, title, time, price):
-    return models.Recipe.objects.create(
-        user=user,
-        title=title,
-        time_minutes=time,
-        price=price,
-    )
+def create_recipe(user, **params):
+    defaults = {
+        "title": "Sample recipe",
+        "time_minutes": 10,
+        "price": 5.00,
+    }
+    defaults.update(params)
+
+    return models.Recipe.objects.create(user=user, **defaults)
+
+
+def all_recipes():
+    return models.Recipe.objects.all().order_by("-id")
