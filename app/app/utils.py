@@ -39,6 +39,18 @@ USER_PAYLOAD_WRONG = {
     "name": "Testing"
 }
 
+RECIPE_PAYLOAD = {
+    "title": "chocolate cake",
+    "time_minutes": 30,
+    "price": 5.00,
+}
+
+RECIPE_PAYLOAD_UPDATE = {
+    "title": "chocolate muffin",
+    "time_minutes": 30,
+    "price": 5.00,
+}
+
 
 def recipe_detail_url(recipe_id):
     return reverse("recipe:recipe-detail", args=[recipe_id])

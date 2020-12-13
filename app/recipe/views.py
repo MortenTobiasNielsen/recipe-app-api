@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from core.models import Tag, Ingredient, Recipe
+
 from recipe import serializers
 
 
@@ -14,7 +15,7 @@ class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        """Returns objects for the current authenticated user"""
+        """Return objects for the current authenticated user"""
         return self.queryset.filter(user=self.request.user).order_by("-name")
 
     def perform_create(self, serializer):
@@ -51,3 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return serializers.RecipeDetailSerializer
 
         return self.serializer_class
+
+    def perform_create(self, serializer):
+        """Create a new recipe"""
+        serializer.save(user=self.request.user)
