@@ -11,7 +11,6 @@ ME_URL = reverse("user:me")
 TAGS_URL = reverse("recipe:tag-list")
 RECIPES_URL = reverse("recipe:recipe-list")
 
-
 ADMIN_PAYLOAD = {
     "email": "admin@test.com",
     "password": "password123"
@@ -39,6 +38,14 @@ USER_PAYLOAD_WRONG = {
     "password": "wrong",
     "name": "Testing"
 }
+
+
+def recipe_detail_url(recipe_id):
+    return reverse("recipe:recipe-detail", args=[recipe_id])
+
+
+def admin_detail_url(user_id):
+    return reverse("admin:core_user_change", args=[user_id])
 
 
 def create_superuser(**params):

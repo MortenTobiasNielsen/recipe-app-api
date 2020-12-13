@@ -1,5 +1,4 @@
 from django.test import TestCase, Client
-from django.urls import reverse
 
 import app.utils as utils
 
@@ -21,8 +20,7 @@ class AdminSiteTests(TestCase):
 
     def test_user_change_page(self):
         """Test that the user edit page works"""
-        url = reverse("admin:core_user_change", args=[self.user.id])
-        res = self.client.get(url)
+        res = self.client.get(utils.admin_detail_url(self.user.id))
 
         self.assertEqual(res.status_code, 200)
 

@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 
 from core.models import Recipe
 
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 import app.utils as utils
 
@@ -55,4 +55,16 @@ class PrivateRecipeApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_view_recipe_detail(self):
+        """Test viewing a recipe detial"""
+        recipe = utils.create_recipe(self.user)
+        recipe.tags.add(utils.create_tag(self.user, "Vegan"))
+        recipe.ingredients.add(utils.create_ingredent(self.user, "Salt"))
+
+        res = self.client.get(utils.recipe_detail_url(recipe.id))
+
+        serializer = RecipeDetailSerializer(recipe)
+
         self.assertEqual(res.data, serializer.data)
