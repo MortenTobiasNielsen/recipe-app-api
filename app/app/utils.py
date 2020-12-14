@@ -47,8 +47,8 @@ RECIPE_PAYLOAD = {
 
 RECIPE_PAYLOAD_UPDATE = {
     "title": "chocolate muffin",
-    "time_minutes": 30,
-    "price": 5.00,
+    "time_minutes": 25,
+    "price": 10.00,
 }
 
 

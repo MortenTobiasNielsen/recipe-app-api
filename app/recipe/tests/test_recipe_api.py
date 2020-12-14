@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.test import TestCase
 
 from rest_framework import status
@@ -37,7 +39,6 @@ class PrivateRecipeApiTests(TestCase):
         utils.create_recipe(self.user)
 
         res = self.client.get(utils.RECIPES_URL)
-        print(utils.RECIPES_URL)
 
         serializer = RecipeSerializer(utils.all_recipes(), many=True)
 
@@ -84,7 +85,7 @@ class PrivateRecipeApiTests(TestCase):
         """Test creating a recipe with tags"""
         tag1 = utils.create_tag(self.user, "Vegan")
         tag2 = utils.create_tag(self.user, "Dessert")
-        payload = utils.RECIPE_PAYLOAD
+        payload = deepcopy(utils.RECIPE_PAYLOAD)
         payload.update({"tags": [tag1.id, tag2.id]})
         res = self.client.post(utils.RECIPES_URL, payload)
 
@@ -101,7 +102,7 @@ class PrivateRecipeApiTests(TestCase):
         """Test creating a recipe with ingredients"""
         ingredient1 = utils.create_ingredent(self.user, "Prawns")
         ingredient2 = utils.create_ingredent(self.user, "Ginger")
-        payload = utils.RECIPE_PAYLOAD_UPDATE
+        payload = deepcopy(utils.RECIPE_PAYLOAD)
         payload.update({"ingredients": [ingredient1.id, ingredient2.id]})
         res = self.client.post(utils.RECIPES_URL, payload)
 
@@ -113,3 +114,40 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(ingredients.count(), 2)
         self.assertIn(ingredient1, ingredients)
         self.assertIn(ingredient2, ingredients)
+
+    def test_partial_update_recipe(self):
+        """Test updating a recipe with patch"""
+        recipe = utils.create_recipe(self.user)
+        recipe.tags.add(utils.create_tag(self.user, "Spicy"))
+        new_tag = utils.create_tag(self.user, "Curry")
+
+        payload = deepcopy(utils.RECIPE_PAYLOAD)
+        payload.update({"tags": [new_tag.id]})
+
+        url = utils.recipe_detail_url(recipe.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.title, payload["title"])
+        tags = recipe.tags.all()
+        self.assertEqual(len(tags), 1)
+        self.assertIn(new_tag, tags)
+
+    def test_full_update_recipe(self):
+        """Test updating a recipe with put"""
+        recipe = utils.create_recipe(self.user)
+        recipe.tags.add(utils.create_tag(self.user, "Spicy"))
+        url = utils.recipe_detail_url(recipe.id)
+        payload = deepcopy(utils.RECIPE_PAYLOAD)
+        res = self.client.put(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.title, payload["title"])
+        self.assertEqual(recipe.time_minutes, payload["time_minutes"])
+        self.assertEqual(recipe.price, payload["price"])
+        tags = recipe.tags.all()
+        self.assertEqual(len(tags), 0)
