@@ -71,3 +71,34 @@ class PrivateIngredientsApiTests(TestCase):
         res = self.client.post(utils.INGREDIENTS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_ingredients_assigned_to_recipes(self):
+        """Test filtering ingredients by those assigned to recipes"""
+        ingredient1 = utils.create_ingredent(self.user, "Appels")
+        ingredient2 = utils.create_ingredent(self.user, "Turkey")
+
+        recipe = utils.create_recipe(self.user, **utils.RECIPE_PAYLOAD)
+        recipe.ingredients.add(ingredient1)
+
+        res = self.client.get(utils.INGREDIENTS_URL, {"assigned_only": 1})
+
+        serializer1 = IngredientSerializer(ingredient1)
+        serializer2 = IngredientSerializer(ingredient2)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)
+
+    def test_retrieve_ingredients_assigned_unique(self):
+        """Test filtering ingredients by assigned returns unique items"""
+        ingredient = utils.create_ingredent(self.user, "Appels")
+        utils.create_ingredent(self.user, "Turkey")
+
+        recipe1 = utils.create_recipe(self.user, **utils.RECIPE_PAYLOAD)
+        recipe2 = utils.create_recipe(self.user, **utils.RECIPE_PAYLOAD_UPDATE)
+
+        recipe1.ingredients.add(ingredient)
+        recipe2.ingredients.add(ingredient)
+
+        res = self.client.get(utils.INGREDIENTS_URL, {"assigned_only": 1})
+
+        self.assertEqual(len(res.data), 1)
